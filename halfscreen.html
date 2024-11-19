@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halbbreites Bild</title>
+    <style>
+        .half-width {
+            width: 50vw;
+            max-width: 50%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Seite mit halbbreitem Bild</h1>
+    <picture>
+        <source media="(min-width: 1200px)" 
+                srcset="https://picsum.photos/2000/1000 2000w,
+                        https://picsum.photos/1000/500 1000w">
+        <source media="(min-width: 800px)" 
+                srcset="https://picsum.photos/1000/500">
+        <source srcset="https://picsum.photos/800/400 2x,
+                        https://picsum.photos/400/200 1x">
+        <img src="https://picsum.photos/1000/500" 
+             alt="Responsives Beispielbild" 
+             class="half-width">
+    </picture>
+    <p><a href="index.html">Zur Seite mit vollbreitem Bild</a></p>
+</body>
+</html>

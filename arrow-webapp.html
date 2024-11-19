@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Orientation Arrow</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #f0f0f0;
+        }
+        
+        .arrow {
+            font-size: 100px;
+            transform-origin: center;
+            transition: transform 0.1s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="arrow">⬆️</div>
+    
+    <script>
+        const arrow = document.querySelector('.arrow');
+        
+        function handleOrientation(event) {
+            const alpha = event.alpha;
+            if (alpha !== null) {
+                arrow.style.transform = `rotate(${alpha}deg)`;
+            }
+        }
+
+        
+        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+            document.body.addEventListener('click', async () => {
+                try {
+                    const permission = await DeviceOrientationEvent.requestPermission();
+                    if (permission === 'granted') {
+                        window.addEventListener('deviceorientation', handleOrientation);
+                    }
+                } catch (error) {
+                    console.error('Error requesting device orientation permission:', error);
+                }
+            }, { once: true });
+        } else {
+            window.addEventListener('deviceorientation', handleOrientation);
+        }
+    </script>
+</body>
+</html>
