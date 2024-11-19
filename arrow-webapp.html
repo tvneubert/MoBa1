@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Device Orientation Arrow</title>
+    <title>Arrow Orientation Demo</title>
     <style>
         body {
             display: flex;
@@ -17,37 +17,79 @@
         .arrow {
             font-size: 100px;
             transform-origin: center;
-            transition: transform 0.1s ease-out;
+        }
+        
+        #permissionButton {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
+    <button id="permissionButton">Enable Orientation</button>
     <div class="arrow">⬆️</div>
     
     <script>
         const arrow = document.querySelector('.arrow');
-        
+        const button = document.getElementById('permissionButton');
+        let initialAlpha = null;
+
+        // Function to handle device orientation
         function handleOrientation(event) {
-            const alpha = event.alpha;
-            if (alpha !== null) {
-                arrow.style.transform = `rotate(${alpha}deg)`;
+            if (event.alpha === null) {
+                console.log('No alpha value available');
+                return;
             }
+
+            // If this is the first reading, store it as the initial orientation
+            if (initialAlpha === null) {
+                initialAlpha = event.alpha;
+            }
+
+            // Calculate the relative rotation
+            let rotation = event.alpha - initialAlpha;
+            
+            // Keep the arrow pointing in the original direction
+            arrow.style.transform = `rotate(${rotation}deg)`;
         }
 
-        
-        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-            document.body.addEventListener('click', async () => {
+        // Function to request and handle permissions
+        async function requestPermission() {
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                // iOS 13+ requires permission
                 try {
                     const permission = await DeviceOrientationEvent.requestPermission();
                     if (permission === 'granted') {
-                        window.addEventListener('deviceorientation', handleOrientation);
+                        window.addEventListener('deviceorientation', handleOrientation, true);
+                        button.style.display = 'none';
+                    } else {
+                        alert('Permission to access device orientation was denied');
                     }
                 } catch (error) {
-                    console.error('Error requesting device orientation permission:', error);
+                    alert('Error requesting device orientation permission');
+                    console.error(error);
                 }
-            }, { once: true });
-        } else {
-            window.addEventListener('deviceorientation', handleOrientation);
+            } else {
+                // Non-iOS devices
+                window.addEventListener('deviceorientation', handleOrientation, true);
+                button.style.display = 'none';
+            }
+        }
+
+        // Add click handler to the button
+        button.addEventListener('click', requestPermission);
+
+        // If not iOS 13+, start listening immediately
+        if (typeof DeviceOrientationEvent.requestPermission !== 'function') {
+            requestPermission();
         }
     </script>
 </body>
